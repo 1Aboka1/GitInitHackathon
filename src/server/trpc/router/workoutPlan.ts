@@ -57,7 +57,7 @@ export const workoutPlanRouter = router({
 	)
 	.query(async ({ ctx, input }) => {
 	    try {
-		await ctx.prisma.workoutPlan.findFirst({
+		return await ctx.prisma.workoutPlan.findFirst({
 		    where: {
 			userInfoId: input.userInfoId,
 		    }

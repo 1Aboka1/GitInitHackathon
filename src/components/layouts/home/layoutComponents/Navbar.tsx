@@ -49,7 +49,7 @@ const Navbar = () => {
 			    {
 				!session ? 
 				<Button className='p-2 px-5 rounded-xl bg-gradient-to-br from-blue-600 border text-white whitespace-nowrap' variant="contained" onClick={() => router.push('/auth/login')}>Build your workout</Button> :
-				<Button className='p-2 px-5 rounded-xl bg-gradient-to-br from-blue-600 border text-white whitespace-nowrap' variant="contained" onClick={() => router.push('/profile')}>Your workout</Button>
+				<Button className='p-2 px-5 rounded-xl bg-gradient-to-br from-blue-600 border text-white whitespace-nowrap' variant="contained" onClick={() => router.push('/profile/workoutPlan')}>Your workout</Button>
 			    }
 			</div>
 		    </div>

@@ -69,7 +69,7 @@ export const authRouter = router({
 	)
 	.query(async ({ ctx, input }) => {
 	    try {
-		await ctx.prisma.userInfo.findFirst({
+		return await ctx.prisma.userInfo.findFirst({
 		    where: {
 			userId: input.userId,
 		    },

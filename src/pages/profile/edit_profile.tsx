@@ -25,8 +25,8 @@ import {RiDashboard3Line} from "react-icons/ri"
 import {trpc} from "../../utils/trpc"
 
 type Inputs = {
-    height: string,
-    weight: string,
+    height: number,
+    weight: number,
     goal: 'MuscleGain' | 'FatLoss' | 'Maintanence',
     gender: 'Male' | 'Female'
 }
@@ -68,19 +68,24 @@ const EditProfile = () => {
     })
     
     const [userId, setUserId] = useState('')
-    const userInfo = trpc.auth.getUserInfo.useQuery({ userId: userId }).data
+    const userInfo = trpc.auth.getUserInfo.useQuery({ userId: userId })
     
     useEffect(() => {
-	session?.user?.id ? setUserId(session?.user?.id) : router.push('/auth/login')
-	if(userInfo === undefined) {
+	session?.user?.id ? setUserId(session?.user?.id) : null
+    }, [session?.user?.id])
+
+    useEffect(() => {
+	if(userInfo.isError || userInfo.data === undefined || userInfo.data === null) {
 	    null
 	} else {
-	    setValue('height', userInfo.height)
-	    setValue('weight', userInfo.weight)
-	    setValue('gender', userInfo.gender)
-	    setValue('goal', userInfo.goal)
+	    setValue('height', userInfo.data.height)
+	    setValue('weight', userInfo.data.weight)
+	    const gender = userInfo.data.gender as unknown as 'Male' | 'Female'
+	    setValue('gender', gender)
+	    const goal = userInfo.data.goal as unknown as Inputs['goal']
+	    setValue('goal', goal)
 	}
-    }, [])
+    }, [userInfo])
     
     const handleGenderChange = (event: any) => {
 	const { target: { value } } = event
@@ -110,6 +115,7 @@ const EditProfile = () => {
 				    onChange={handleGenderChange}
 				    size='small'
 				    className="rounded-2xl"
+				    defaultValue={getValues().gender}
 				    fullWidth
 				>
 				    <MenuItem key='Male' value='Male'>Male</MenuItem>
@@ -149,6 +155,7 @@ const EditProfile = () => {
 				    value={getValues().goal}
 				    onChange={handleGoalChange}
 				    size='small'
+				    defaultValue={getValues().goal}
 				    className="rounded-2xl"
 				    fullWidth
 				>
@@ -241,7 +248,7 @@ const Tab = ({name, icon, url}: {name: string, icon: ReactNode, url: string}) =>
 		url === router.pathname ?
 		(
 		    <motion.div 
-			className="absolute bg-blue-900 w-60 rounded-tr-3xl rounded-br-3xl h-full z-0"
+			className="absolute bg-gradient-to-r from-black to-blue-900 w-60 rounded-tr-3xl rounded-br-3xl h-full z-0"
 			initial={{ left: -500 }}
 			animate={{ left: -50 }}
 			transition={{ duration: 1 }}

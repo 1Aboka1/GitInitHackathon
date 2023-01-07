@@ -102,6 +102,10 @@ model WorkoutPlan {
 	updatedAt 	DateTime 	@updatedAt
 }
 
+model ExerciseInstance {
+    
+}
+
 model Exercise {
     id		String		@id @default(cuid())
 	name	String
