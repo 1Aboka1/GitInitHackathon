@@ -116,7 +116,7 @@ model BuiltExercise {
 model Exercise {
     id		String		@id @default(cuid())
 	name	String
-	description	String
+	description	String?
 	equipment	Equipment	@relation(fields: [equipmentId], references: [id])
 	equipmentId	String
 	primaryMuscle	PrimaryMuscle	@relation(fields: [primaryMuscleId], references: [id])
