@@ -29,21 +29,21 @@ export const workoutPlanRouter = router({
 	    z.object({
 		exerciseId: z.string(),
 		workoutId: z.string(),
+		sets: z.number(),
+		reps: z.number(),
+		rest: z.number(),
 	    })
 	)
 	.mutation(async ({ ctx, input }) => {
 	    try {
-		    await ctx.prisma.verificationToken.update({
-			where: {
-			    id: input.workoutId,
-			},
+		    await ctx.prisma.workoutPlanOnExercise.create({
 			data: {
-			    exercises: {
-				connect: {
-				    id: input.exerciseId,
-				},
-			    },
-			},
+			    exerciseId: input.exerciseId,
+			    workoutPlanId: input.workoutId,
+			    sets: input.sets,
+			    reps: input.reps,
+			    rest: input.reps,
+			}
 		    })
 	    } catch(error) {
 		console.error(error)
