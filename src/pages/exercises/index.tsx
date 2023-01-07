@@ -1,7 +1,7 @@
 import {Box, Chip, MenuItem, OutlinedInput, Select, SelectChangeEvent, Theme} from "@mui/material"
 import {GetServerSideProps, InferGetServerSidePropsType, InferGetStaticPropsType} from "next"
 import {useRouter} from "next/router"
-import {ReactElement, useState} from "react"
+import {ReactElement, useEffect, useState} from "react"
 import Footer from "../../components/layouts/home/layoutComponents/Footer"
 import Navbar from "../../components/layouts/home/layoutComponents/Navbar"
 import MainLayout from "../../components/layouts/home/MainLayout"
@@ -36,16 +36,27 @@ const Exercises = ({ exercises, muscleFilters, equipmentFilters }: InferGetServe
     const [selectedEquipmentFilters, setSelectedEquipmentFilters] = useState<string[]>([])
     const router = useRouter()
 
+    useEffect(() => {
+	if(!(router.query['muscleFilters'] !== null || router.query['equipmentFilters'] !== null)) {
+	    router.replace('/exercises?muscleFilters=null&equipmentFilters=null')
+	}
+    }, [])
+
     const handleMuscleFilterChange = (event: SelectChangeEvent<typeof selectedMuscleFilters>) => {
 	const { target: { value } } = event
 	const tempFilters = typeof value === 'string' ? value.split(',') : value
 	setSelectedMuscleFilters(tempFilters)
-	router.push('/exercises?=' + tempFilters)
+	const tempEquipmentFilters = router.query['equipmentFilters']
+	router.replace(`/exercises?muscleFilters={tempFilters}&equipmentFilters={tempEquipmentFilters}` , undefined, { shallow: true })
     }
 
     const handleEquipmentFilterChange = (event: SelectChangeEvent<typeof selectedEquipmentFilters>) => {
 	const { target: { value } } = event
-	setSelectedEquipmentFilters(typeof value === 'string' ? value.split(',') : value)
+	const tempFilters = typeof value === 'string' ? value.split(',') : value
+	setSelectedEquipmentFilters(tempFilters)
+	const tempMuscleFilters = router.query['muscleFilters']
+	const formattedString = `/exercises?muscleFilters={tempMuscleFilters}&equipmentFilters={tempFilters}`
+	router.replace(formattedString, undefined, { shallow: true })
     }
 
     return (
