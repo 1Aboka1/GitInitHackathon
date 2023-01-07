@@ -9,19 +9,29 @@ import { prisma } from "../../server/db/client"
 import {darkTheme} from "../../styles/themes"
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-console.log(query)
-    const equipmentRoute = query['equipmentFilters']
-    const muscleRoute = query['muscleFilters']
+    const equipmentRoute = query['equipmentFilters'] as string
     const tempEquipmentFilters = typeof equipmentRoute === 'string' ? equipmentRoute.split(',') : equipmentRoute
+    const muscleRoute = query['muscleFilters'] as string
     const tempMuscleFilters = typeof muscleRoute === 'string' ? muscleRoute.split(',') : muscleRoute
-    const exercises = await prisma.primaryMuscle.findMany({
-	include: {
-	    exercises: true,
-	},
+    const exercises = await prisma.exercise.findMany({
 	where: {
-	    id: query?.id as string,
-	},
+	    primaryMuscles: {
+		some: {
+		    name: {
+			in: tempMuscleFilters,
+		    }
+		}
+	    },
+	    equipments: {
+		some: {
+		    name: {
+			in: tempEquipmentFilters,
+		    }
+		}
+	    }
+	}
     })
+    console.log(exercises)
 
     const muscleFilters = await prisma.primaryMuscle.findMany()
     const equipmentFilters = await prisma.equipment.findMany()
@@ -39,6 +49,7 @@ const Exercises = ({ exercises, muscleFilters, equipmentFilters }: InferGetServe
     const [selectedMuscleFilters, setSelectedMuscleFilters] = useState<string[]>([])
     const [selectedEquipmentFilters, setSelectedEquipmentFilters] = useState<string[]>([])
     const router = useRouter()
+    console.log(exercises)
 
     useEffect(() => {
 	if((router.query['muscleFilters'] === undefined || router.query['equipmentFilters'] === undefined)) {
