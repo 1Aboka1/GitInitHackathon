@@ -54,14 +54,33 @@ const EditProfile = () => {
     })
     const updateUserInfo = trpc.auth.upsertUserInfo.useMutation()
     const onFormSubmit = handleSubmit(async (data) => {
-	updateUserInfo
-	    .mutateAsync({
-		userId: session?.user?.id,
-		height: data.height,
-		weight: data.weight
-	    })
-	router.push('/')
+	if(session?.user?.id) {
+	    updateUserInfo
+		.mutateAsync({
+		    userId: session?.user?.id,
+		    height: data.height,
+		    weight: data.weight,
+		    gender: data.gender,
+		    goal: data.goal,
+		})
+	}
+	router.back()
     })
+    
+    const [userId, setUserId] = useState('')
+    const userInfo = trpc.auth.getUserInfo.useQuery({ userId: userId }).data
+    
+    useEffect(() => {
+	session?.user?.id ? setUserId(session?.user?.id) : router.push('/auth/login')
+	if(userInfo === undefined) {
+	    null
+	} else {
+	    setValue('height', userInfo.height)
+	    setValue('weight', userInfo.weight)
+	    setValue('gender', userInfo.gender)
+	    setValue('goal', userInfo.goal)
+	}
+    }, [])
     
     const handleGenderChange = (event: any) => {
 	const { target: { value } } = event
@@ -104,6 +123,7 @@ const EditProfile = () => {
 				    {...register('height', { required: true })}
 				    variant="outlined" 
 				    size='small' 
+				    type={'number'}
 				    placeholder="Your height" 
 				    fullWidth 
 				    color={errors.height && 'error'}
@@ -116,6 +136,7 @@ const EditProfile = () => {
 				    {...register('weight', { required: true })}
 				    variant="outlined" 
 				    size='small' 
+				    type="number"
 				    placeholder="Your weight" 
 				    fullWidth 
 				    color={errors.weight && 'error'}
