@@ -37,8 +37,15 @@ const Exercises = ({ exercises, muscleFilters, equipmentFilters }: InferGetServe
     const router = useRouter()
 
     useEffect(() => {
-	if(!(router.query['muscleFilters'] !== null || router.query['equipmentFilters'] !== null)) {
-	    router.replace('/exercises?muscleFilters=null&equipmentFilters=null')
+	if((router.query['muscleFilters'] === undefined || router.query['equipmentFilters'] === undefined)) {
+	    router.push('/exercises?muscleFilters=[]&equipmentFilters=[]', undefined, { shallow: true })
+	} else {
+	    const muscleRoute = router.query['muscleFilters']
+	    const tempMuscleFilters = typeof muscleRoute === 'string' ? muscleRoute.split(',') : muscleRoute
+	    setSelectedMuscleFilters(tempMuscleFilters)
+	    const equipmentRoute = router.query['equipmentFilters']
+	    const tempEquipmentFilters = typeof equipmentRoute === 'string' ? equipmentRoute.split(',') : equipmentRoute
+	    setSelectedEquipmentFilters(tempEquipmentFilters)
 	}
     }, [])
 
@@ -47,7 +54,7 @@ const Exercises = ({ exercises, muscleFilters, equipmentFilters }: InferGetServe
 	const tempFilters = typeof value === 'string' ? value.split(',') : value
 	setSelectedMuscleFilters(tempFilters)
 	const tempEquipmentFilters = router.query['equipmentFilters']
-	router.replace(`/exercises?muscleFilters={tempFilters}&equipmentFilters={tempEquipmentFilters}` , undefined, { shallow: true })
+	router.push(`/exercises?muscleFilters=${tempFilters}&equipmentFilters=${tempEquipmentFilters}`)
     }
 
     const handleEquipmentFilterChange = (event: SelectChangeEvent<typeof selectedEquipmentFilters>) => {
@@ -55,8 +62,7 @@ const Exercises = ({ exercises, muscleFilters, equipmentFilters }: InferGetServe
 	const tempFilters = typeof value === 'string' ? value.split(',') : value
 	setSelectedEquipmentFilters(tempFilters)
 	const tempMuscleFilters = router.query['muscleFilters']
-	const formattedString = `/exercises?muscleFilters={tempMuscleFilters}&equipmentFilters={tempFilters}`
-	router.replace(formattedString, undefined, { shallow: true })
+	router.push(`/exercises?muscleFilters=${tempMuscleFilters}&equipmentFilters=${tempFilters}`)
     }
 
     return (
