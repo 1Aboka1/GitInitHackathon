@@ -27,14 +27,12 @@ const MyApp: AppType<{ session: Session | null }> = ({
     const getLayout = Component.getLayout || ((page: ReactNode) => page)
 
     return (
-	<ChakraProvider>
-	    <ThemeProvider theme={darkTheme}>
-		<SessionProvider session={session}>
-		    <NextNProgress/>
-		    {getLayout(<Component {...pageProps} />)}
-		</SessionProvider>
-	    </ThemeProvider>
-	</ChakraProvider>
+	<ThemeProvider theme={darkTheme}>
+	    <SessionProvider session={session}>
+		<NextNProgress/>
+		{getLayout(<Component {...pageProps} />)}
+	    </SessionProvider>
+	</ThemeProvider>
   )
 }
 
