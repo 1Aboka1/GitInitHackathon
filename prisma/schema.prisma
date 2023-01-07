@@ -78,7 +78,7 @@ model UserInfo {
 	height	Int
 	weight	Int
 	goal	Goal	@default(None)
-		
+	workoutPlan	WorkoutPlan?		
 	user	User		@relation(fields: [userId], references: [id])
 	userId	String	@unique 
 	createdAt 	DateTime 	@default(now())
@@ -89,17 +89,9 @@ model UserInfo {
 model WorkoutPlan {
     id		String		@id @default(cuid())
 	name	String
-	builtExercise	BuiltExercise[]
-	createdAt 	DateTime 	@default(now())
-	updatedAt 	DateTime 	@updatedAt
-}
-
-model BuiltExercise {
-    id		String		@id @default(cuid())
-	workoutPlan	WorkoutPlan	@relation(fields: [workoutPlanId], references: [id])
-	workoutPlanId	String
-	exercise	Exercise	@relation(fields: [exerciseId], references: [id])
-	exerciseId	String	
+	userInfo	UserInfo	@relation(fields: [userInfoId], references: [id])
+	userInfoId	String		@unique
+	exercises	Exercise[]
 	createdAt 	DateTime 	@default(now())
 	updatedAt 	DateTime 	@updatedAt
 }
@@ -109,8 +101,8 @@ model Exercise {
 	name	String
 	description	String?
 	equipments	Equipment[]
+	workoutPlans	WorkoutPlan[]
 	primaryMuscles	PrimaryMuscle[]
-	builtExercises	BuiltExercise[]
 	image		String?
 	createdAt 	DateTime 	@default(now())
 	updatedAt 	DateTime 	@updatedAt

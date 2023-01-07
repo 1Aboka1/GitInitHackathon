@@ -10,6 +10,7 @@ import MainLayout from "../../components/layouts/home/MainLayout"
 import { prisma } from "../../server/db/client"
 import {darkTheme} from "../../styles/themes"
 import {ChakraProvider, extendTheme, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, ThemeConfig, useColorMode} from "@chakra-ui/react"
+import {trpc} from "../../utils/trpc"
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     const equipmentRoute = query['equipmentFilters'] as string
@@ -115,6 +116,12 @@ const Exercises = ({ exercises, muscleFilters, equipmentFilters }: InferGetServe
 	}
 	router.push(`/exercises?muscleFilters=${tempMuscleFilters}&equipmentFilters=${tempFilters}`)
     }
+
+    const addExercise = trpc.workoutPlan.addExerciseToWorkoutPlan.useMutation()
+    const handleAddExercise = () => {
+					
+    }
+
     const [isModalOpen, setModalOpen] = useState(false)
 
     return (
@@ -133,7 +140,7 @@ const Exercises = ({ exercises, muscleFilters, equipmentFilters }: InferGetServe
 					<TextField variant="outlined" className="rounded-xl bg-gray-900" placeholder="Reps"/>
 					<TextField variant="outlined" className="rounded-xl bg-gray-900" placeholder="Rests"/>
 				    </div>
-				    <Button className="rounded-xl bg-gradient-to-tl from-blue-500 to-gray-500 text-white font-semibold" variant="contained">Add</Button>
+				    <Button onClick={() => handleAddExercise} className="rounded-xl bg-gradient-to-tl from-blue-500 to-gray-500 text-white font-semibold" variant="contained">Add</Button>
 				</div>
 			    </ThemeProvider>
 			</ModalBody>
