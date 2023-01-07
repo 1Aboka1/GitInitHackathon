@@ -10,6 +10,10 @@ import {darkTheme} from "../../styles/themes"
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 console.log(query)
+    const equipmentRoute = query['equipmentFilters']
+    const muscleRoute = query['muscleFilters']
+    const tempEquipmentFilters = typeof equipmentRoute === 'string' ? equipmentRoute.split(',') : equipmentRoute
+    const tempMuscleFilters = typeof muscleRoute === 'string' ? muscleRoute.split(',') : muscleRoute
     const exercises = await prisma.primaryMuscle.findMany({
 	include: {
 	    exercises: true,
