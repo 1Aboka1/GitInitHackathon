@@ -73,10 +73,16 @@ enum Goal {
 	None
 }
 
+enum Gender {
+    Male
+    Female
+}
+
 model UserInfo {
     id		String		@id @default(cuid())
 	height	Int
 	weight	Int
+	gender	Gender
 	goal	Goal	@default(None)
 	workoutPlan	WorkoutPlan?		
 	user	User		@relation(fields: [userId], references: [id])

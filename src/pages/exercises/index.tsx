@@ -3,6 +3,7 @@ import {GetServerSideProps, InferGetServerSidePropsType, InferGetStaticPropsType
 import {useRouter} from "next/router"
 import { IoAdd } from 'react-icons/io5'
 import { BiDumbbell } from 'react-icons/bi'
+import { Button as ChakraButton } from '@chakra-ui/react'
 import {ReactElement, useEffect, useState} from "react"
 import Footer from "../../components/layouts/home/layoutComponents/Footer"
 import Navbar from "../../components/layouts/home/layoutComponents/Navbar"
@@ -11,6 +12,7 @@ import { prisma } from "../../server/db/client"
 import {darkTheme} from "../../styles/themes"
 import {ChakraProvider, extendTheme, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, ThemeConfig, useColorMode} from "@chakra-ui/react"
 import {trpc} from "../../utils/trpc"
+import {useSession} from "next-auth/react"
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     const equipmentRoute = query['equipmentFilters'] as string
@@ -71,6 +73,9 @@ const Exercises = ({ exercises, muscleFilters, equipmentFilters }: InferGetServe
     const [selectedMuscleFilters, setSelectedMuscleFilters] = useState<string[]>([])
     const [selectedEquipmentFilters, setSelectedEquipmentFilters] = useState<string[]>([])
     const router = useRouter()
+    const [isModalOpen, setModalOpen] = useState(false)
+    const { data: session } = useSession()
+    const [modalExcercise, setModalExcercise] = useState<string>('')
 
     useEffect(() => {
 	if((router.query['muscleFilters'] === undefined || router.query['equipmentFilters'] === undefined)) {
@@ -117,12 +122,16 @@ const Exercises = ({ exercises, muscleFilters, equipmentFilters }: InferGetServe
 	router.push(`/exercises?muscleFilters=${tempMuscleFilters}&equipmentFilters=${tempFilters}`)
     }
 
+    const [userId, setUserId] = useState('')
+    const [userInfoId, setUserInfoId] = useState('')
     const addExercise = trpc.workoutPlan.addExerciseToWorkoutPlan.useMutation()
-    const handleAddExercise = () => {
-					
+    const getWorkoutPlan = trpc.workoutPlan.getWorkoutPlan.useQuery({ userInfoId: userInfoId }).data
+    const queryUserInfo = trpc.auth.getUserInfo.useQuery({ userId: userId }).data
+    
+    const handleSomething = () => {
+	session?.user?.id ? setUserId(session?.user?.id) : router.push('/auth/login')
+	const userInfo = queryUserInfo !== undefined ? queryUserInfo : router.push('/profile/edit_profile')
     }
-
-    const [isModalOpen, setModalOpen] = useState(false)
 
     return (
 	<div className="min-h-screen bg-black pt-10 space-y-3">
@@ -140,11 +149,12 @@ const Exercises = ({ exercises, muscleFilters, equipmentFilters }: InferGetServe
 					<TextField variant="outlined" className="rounded-xl bg-gray-900" placeholder="Reps"/>
 					<TextField variant="outlined" className="rounded-xl bg-gray-900" placeholder="Rests"/>
 				    </div>
-				    <Button onClick={() => handleAddExercise} className="rounded-xl bg-gradient-to-tl from-blue-500 to-gray-500 text-white font-semibold" variant="contained">Add</Button>
+				    <Button onClick={handleSomething} className="rounded-xl bg-gradient-to-tl from-blue-500 to-gray-500 text-white font-semibold" variant="contained">Add</Button>
 				</div>
 			    </ThemeProvider>
 			</ModalBody>
-			<ModalFooter></ModalFooter>
+			<ModalFooter>
+			</ModalFooter>
 		    </ModalContent>
 		</Modal>
 	    </ChakraProvider>
@@ -221,14 +231,14 @@ const Exercises = ({ exercises, muscleFilters, equipmentFilters }: InferGetServe
 	    </div>
 	    <div className="flex flex-col divide-y divide-dotted space-y-6">
 		{
-		    exercises.map((exercise: typeof exercises[0]) => <Excercise setModalOpen={setModalOpen} key={exercise.id} exercise={exercise}/>)	
+		    exercises.map((exercise: typeof exercises[0]) => <Excercise setModalExcercise={setModalExcercise} setModalOpen={setModalOpen} key={exercise.id} exercise={exercise}/>)	
 		}
 	    </div>
 	</div>
     )
 }
 
-const Excercise = ({ exercise, setModalOpen }: any) => {
+const Excercise = ({ exercise, setModalOpen, setModalExcercise }: any) => {
     const [equipments, setEquipments] = useState<string>()
     const [primaryMuscles, setPrimaryMuscles] = useState<string>()
     useEffect(() => {
@@ -262,7 +272,7 @@ const Excercise = ({ exercise, setModalOpen }: any) => {
 		    <Button
 			variant="outlined"
 			className='rounded-xl border border-blue-800 text-white px-3'
-			onClick={() => setModalOpen(true)}
+			onClick={() => {setModalExcercise(exercise.id); setModalOpen(true) }}
 		    >
 			<IoAdd className="mr-2" size={24}/>
 			Add
