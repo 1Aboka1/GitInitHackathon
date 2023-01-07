@@ -94,15 +94,6 @@ model WorkoutPlan {
 	updatedAt 	DateTime 	@updatedAt
 }
 
-model Equipment {
-    id		String		@id @default(cuid())
-	name	String
-	description	String
-	exercises	Exercise[]
-	createdAt 	DateTime 	@default(now())
-	updatedAt 	DateTime 	@updatedAt
-}
-
 model BuiltExercise {
     id		String		@id @default(cuid())
 	workoutPlan	WorkoutPlan	@relation(fields: [workoutPlanId], references: [id])
@@ -117,11 +108,10 @@ model Exercise {
     id		String		@id @default(cuid())
 	name	String
 	description	String?
-	equipment	Equipment	@relation(fields: [equipmentId], references: [id])
-	equipmentId	String
-	primaryMuscle	PrimaryMuscle	@relation(fields: [primaryMuscleId], references: [id])
-	primaryMuscleId	String
+	equipments	Equipment[]
+	primaryMuscles	PrimaryMuscle[]
 	builtExercises	BuiltExercise[]
+	image		String?
 	createdAt 	DateTime 	@default(now())
 	updatedAt 	DateTime 	@updatedAt
 }
@@ -129,7 +119,16 @@ model Exercise {
 model PrimaryMuscle {
     id		String		@id @default(cuid())
 	name	String
-	description	String
+	description	String?
+	exercises	Exercise[]
+	createdAt 	DateTime 	@default(now())
+	updatedAt 	DateTime 	@updatedAt
+}
+
+model Equipment {
+    id		String		@id @default(cuid())
+	name	String
+	description	String?
 	exercises	Exercise[]
 	createdAt 	DateTime 	@default(now())
 	updatedAt 	DateTime 	@updatedAt

@@ -42,9 +42,9 @@ const Navbar = () => {
 			}}
 		    />
 		    <div className="flex flex-row space-x-2 items-center justify-center">
-			<Button className='p-2 px-5 rounded-xl text-white whitespace-nowrap' variant="outlined">Home</Button>
+			<Button className='p-2 px-5 rounded-xl text-white whitespace-nowrap' variant="outlined" onClick={() => router.push('/')}>Home</Button>
 			<Button className='p-2 px-5 rounded-xl text-white whitespace-nowrap' variant="outlined">Workout plans</Button>
-			<Button className='p-2 px-5 rounded-xl text-white whitespace-nowrap' variant="outlined">Exercises list</Button>
+			<Button className='p-2 px-5 rounded-xl text-white whitespace-nowrap' variant="outlined" onClick={() => router.push('/exercises')}>Exercises list</Button>
 			<div className="border rounded-xl border-gray-200">
 			    {
 				!session ? 
