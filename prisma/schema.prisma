@@ -97,13 +97,20 @@ model WorkoutPlan {
 	name	String
 	userInfo	UserInfo	@relation(fields: [userInfoId], references: [id])
 	userInfoId	String		@unique
-	exercises	Exercise[]
+	workoutPlanOnExercises WorkoutPlanOnExercise[]
 	createdAt 	DateTime 	@default(now())
 	updatedAt 	DateTime 	@updatedAt
 }
 
-model ExerciseInstance {
-    
+model WorkoutPlanOnExercise {
+    @@id([workoutPlanId, exerciseId])
+    workoutPlan		WorkoutPlan	@relation(fields: [workoutPlanId], references: [id])	
+    workoutPlanId	String
+    sets		Int
+    reps		Int
+    rest		Int
+    exercise		Exercise	@relation(fields: [exerciseId], references: [id])
+    exerciseId		String
 }
 
 model Exercise {
@@ -111,8 +118,8 @@ model Exercise {
 	name	String
 	description	String?
 	equipments	Equipment[]
-	workoutPlans	WorkoutPlan[]
 	primaryMuscles	PrimaryMuscle[]
+	workoutPlanOnExercises WorkoutPlanOnExercise[]
 	image		String?
 	createdAt 	DateTime 	@default(now())
 	updatedAt 	DateTime 	@updatedAt

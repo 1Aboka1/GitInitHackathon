@@ -33,7 +33,7 @@ export const workoutPlanRouter = router({
 	)
 	.mutation(async ({ ctx, input }) => {
 	    try {
-		    await ctx.prisma.workoutPlan.update({
+		    await ctx.prisma.verificationToken.update({
 			where: {
 			    id: input.workoutId,
 			},

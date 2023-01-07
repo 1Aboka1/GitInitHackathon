@@ -122,15 +122,32 @@ const Exercises = ({ exercises, muscleFilters, equipmentFilters }: InferGetServe
 	router.push(`/exercises?muscleFilters=${tempMuscleFilters}&equipmentFilters=${tempFilters}`)
     }
 
-    const [userId, setUserId] = useState('')
+    useEffect(() => {
+	session?.user?.id ? setUserId(session?.user?.id) : null
+    }, [session?.user?.id])
+
     const [userInfoId, setUserInfoId] = useState('')
+    const [userId, setUserId] = useState('')
+
+    const userInfo = trpc.auth.getUserInfo.useQuery({ userId: userId })
+    const workoutPlan = trpc.workoutPlan.getWorkoutPlan.useQuery({ userInfoId: userInfoId })
     const addExercise = trpc.workoutPlan.addExerciseToWorkoutPlan.useMutation()
-    const getWorkoutPlan = trpc.workoutPlan.getWorkoutPlan.useQuery({ userInfoId: userInfoId }).data
-    const queryUserInfo = trpc.auth.getUserInfo.useQuery({ userId: userId }).data
+
+    useEffect(() => {
+	userInfo.data?.id ? setUserInfoId(userInfo.data?.id) : null
+    }, [userInfo.data?.id])
     
     const handleSomething = () => {
-	session?.user?.id ? setUserId(session?.user?.id) : router.push('/auth/login')
-	const userInfo = queryUserInfo !== undefined ? queryUserInfo : router.push('/profile/edit_profile')
+	if(workoutPlan.data?.id) {
+	    addExercise
+		.mutateAsync({
+		    exerciseId: modalExcercise,
+		    workoutId: workoutPlan.data?.id,
+		})
+		.catch((error) => {
+		    console.log(error)
+		})
+	}
     }
 
     return (
