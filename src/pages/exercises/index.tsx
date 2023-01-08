@@ -360,11 +360,12 @@ const Excercise = ({ exercise, setModalOpen, setModalExcercise, workoutPlan }: a
 	setPrimaryMuscles(tempMuscle.substring(0, tempMuscle.length - 1))
     }, [])
 
+    const router = useRouter()
     if(equipments && primaryMuscles) {
 	return (
 	    <div className="flex flex-row justify-between items-center pt-3">
 		<div className="space-y-1">
-		    <h1 className="text-3xl font-semibold text-white">{exercise.name}</h1>
+		    <h1 className="text-3xl font-semibold text-white cursor-pointer" onClick={() => router.push(`/exercises/${exercise.id}`)}>{exercise.name}</h1>
 		    <p className="text-gray-100 ">Equipment: <span className="text-gray-400">{equipments}</span></p>
 		    <p className="text-gray-100">Primary Muscles: <span className="text-gray-400">{primaryMuscles}</span></p>
 		</div>
@@ -372,6 +373,7 @@ const Excercise = ({ exercise, setModalOpen, setModalExcercise, workoutPlan }: a
 		    <Button
 			variant="contained"
 			className='text-white rounded-xl bg-gradient-to-tr from-blue-700'
+			onClick={() => router.push(`/exercises/${exercise.id}`)}
 		    >
 			View details
 		    </Button>

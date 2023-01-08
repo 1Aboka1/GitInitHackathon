@@ -88,12 +88,13 @@ const Excercise = ({ exercise, handleDelete }: any) => {
 	})
 	setPrimaryMuscles(tempMuscle.substring(0, tempMuscle.length - 1))
     }, [])
+    const router = useRouter()
 
     if(equipments && primaryMuscles) {
 	return (
 	    <div className="flex flex-row justify-between items-center pt-3">
 		<div className="space-y-1">
-		    <h1 className="text-3xl font-semibold text-gray-200">{exercise.exercise.name}</h1>
+		    <h1 className="text-3xl font-semibold text-white cursor-pointer" onClick={() => router.push(`/exercises/${exercise.exercise.id}`)}>{exercise.exercise.name}</h1>
 		    <p className="text-gray-100 ">Equipment: <span className="text-gray-400">{equipments}</span></p>
 		    <p className="text-gray-100">Primary Muscles: <span className="text-gray-400">{primaryMuscles}</span></p>
 		</div>
@@ -107,6 +108,7 @@ const Excercise = ({ exercise, handleDelete }: any) => {
 		    <Button
 			variant="contained"
 			className='text-white rounded-xl bg-gradient-to-tr from-blue-700'
+			onClick={() => router.push(`/exercises/${exercise.exercise.id}`)}
 		    >
 			View details
 		    </Button>
