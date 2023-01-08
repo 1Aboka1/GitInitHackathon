@@ -1,4 +1,5 @@
 import {useSession} from "next-auth/react"
+import ShowingOffAbs from '../../assets/Showing-off-ab-muscles.webp'
 import DumbbelGuy from '../../assets/dumbbell-curls-1.jpg'
 import Image from "next/image"
 import {ReactElement, ReactNode, useEffect, useState} from "react"
@@ -73,6 +74,9 @@ Get your food and activity levels in check and you’ll be fast-tracked to lower
 It’s that simple.
 	</div>
 	<h1 className="text-2xl font-semibold">How do you burn calories?</h1>
+	<div className="flex flex-row justify-center w-full">
+	    <Image src={ShowingOffAbs} alt='showing off abs'/>
+	</div>
 	<div className="whitespace-pre-wrap w-full">
 Much like you get energy coming into your body from different macronutrients, you also burn calories in different ways too:
 <br/>
