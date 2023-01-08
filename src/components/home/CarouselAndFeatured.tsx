@@ -26,7 +26,7 @@ const Carousel = () => {
 		    <div className="w-full min-h-[380px] space-y-4 items-center flex flex-col mt-36">
 			<p className="text-white font-bold text-4xl">Workout Generator</p>
 			<p className="text-gray-300 font-medium text-lg">Build your workout from scratch and start pursuing your goal</p>
-			<Button onClick={() => session ? router.push('/profile') : router.push('/auth/login')} variant="outlined" className='bg-black rounded-xl border-2 border-gray-300 text-white p-3 px-20'>Build</Button>
+			<Button onClick={() => session ? router.push('/exercises') : router.push('/auth/login')} variant="outlined" className='bg-black rounded-xl border-2 border-gray-300 text-white p-3 px-20'>Build</Button>
 			<p className="text-sm text-gray-400">Completely free!</p>
 			<div className="flex flex-row space-x-4">
 			    <div className="flex text-white flex-row items-center space-x-2">

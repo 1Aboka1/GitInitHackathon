@@ -6,10 +6,12 @@ import Footer from "../../components/layouts/home/layoutComponents/Footer"
 import Navbar from "../../components/layouts/home/layoutComponents/Navbar"
 import MainLayout from "../../components/layouts/home/MainLayout"
 import {trpc} from "../../utils/trpc"
+import {useRouter} from "next/router"
 
 const Recommendations = () => {
     const { data: session } = useSession()
     const [userId, setUserId] = useState('')
+    const router = useRouter()
     useEffect(() => {
 	session?.user?.id ? setUserId(session.user.id) : null
     }, [session?.user?.id])
@@ -36,7 +38,7 @@ const Recommendations = () => {
 	<div className="min-h-screen pt-7 space-y-8 text-white">
 	    <div className="space-y-2">
 		<h1 className="font-bold text-4xl">Recommendation</h1>
-		<p className="text-gray-500">These are nutrition recommendations for your particular goal and physique</p>
+		<p className="text-gray-500">These are nutrition and training recommendations for your particular goal and physique</p>
 	    </div>
 	    <div>
 		{
@@ -88,21 +90,28 @@ And together they add up to be your total daily energy expenditure (TDEE).
 
 The key thing for fat loss is that your TDEE is higher than your calorie intake. That way you’re guaranteed to burn fat.
 	</div>
+	<p className="text-gray-500">Source: <a>https://www.greatestphysiques.com/workouts/best-fat-loss-workout-and-diet-plan/</a></p>
     </div>
 )
 
 const Maintanence = (
-    <div>
+    <div className="flex flex-col space-y-5">
 	<h1 className="text-2xl font-semibold">How do maintain body physique?</h1>
 	<div className="whitespace-pre-wrap w-full">
 	   Since you are no longer looking to build your muscles, calorie excess is no longer needed. The days of 5-6 meals with perfectly balanced portions of carbohydrates, fats, and proteins are over. Don't get me wrong, you still should want to eat healthy, good foods as you need to support your existing muscle, but you no longer need to eat over your maintenance calories.
-
+<br/>
+<br/>
 Without these added calories that you have been so used to giving your body, you really do not provide it with the opportunity to get any bigger or stronger. There is even more leeway with the amount of times or the types of foods that you can eat.
 
+<br/>
+<br/>
 Setting your watch or constantly keeping your eye on the clock for every second hour when you should eat is no longer needed, go ahead and eat the standard three meals a day every so often if you want. You aren't trying to build your body anymore, merely maintain it, so being as strict and as disciplined as you used to be are no longer needed. However, don't take what I said the wrong way!
+<br/>
+<br/>
 
 You should still be eating healthy most of the time, you just want to avoid calorie surplus! The nutrition aspect of physique maintenance is the most important, because even with an infrequent or less intense workout regimen, if you are still flooding your body with calories, it will respond by utilizing them to build muscle. Just make sure not to eat too few calories, the one thing you don't want to do is lose muscle!     
 	</div>
+	<p className="text-gray-500">Source: <a>https://www.bodybuilding.com/fun/topicoftheweek133.htm</a></p>
     </div>
 )
 
@@ -146,7 +155,7 @@ You will recover faster, assimilate protein quicker and therefore become lean an
     <br/>
     8. Enough yacking about being skinny, let’s look at some eating plans to support your muscle-building efforts and make all those hours in the gym start to payoff. Below are three eating plans for different body weights. These are only examples so adjust as necessary regarding favorite foods and daily schedules.
 	</div>
-	<p className="text-gray-500">Source: https://www.muscleandstrength.com/articles/skinny-guy-eating-plan-gain-lean-muscle</p>
+	<p className="text-gray-500">Source: <a>https://www.muscleandstrength.com/articles/skinny-guy-eating-plan-gain-lean-muscle</a></p>
     </div>
 )
 

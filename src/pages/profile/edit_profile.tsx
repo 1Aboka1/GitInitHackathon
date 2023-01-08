@@ -63,8 +63,11 @@ const EditProfile = () => {
 		    gender: data.gender,
 		    goal: data.goal,
 		})
+		.finally(() => {
+		    router.push('/recommendations')
+		})
 	}
-	router.back()
+	router.push('/recommendations')
     })
     
     const [userId, setUserId] = useState('')

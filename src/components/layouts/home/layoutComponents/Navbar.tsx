@@ -24,7 +24,7 @@ const Navbar = () => {
 		    <Image 
 			src={Logo} 
 			alt='Logo' 
-			width={100} 
+			width={80} 
 			height={10}
 			className='object-none rounded-3xl cursor-pointer'
 			onClick={() => router.push('/')}
