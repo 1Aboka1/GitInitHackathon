@@ -228,7 +228,7 @@ const Tabs = [
     {
 	name: 'Logout',
 	icon: <CiLogout color="white" size={30}/>,
-	url: '/signOut',
+	url: '/auth/signOut',
     },
 ]
 

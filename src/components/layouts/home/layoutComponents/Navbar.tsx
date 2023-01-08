@@ -26,7 +26,8 @@ const Navbar = () => {
 			alt='Logo' 
 			width={100} 
 			height={10}
-			className='object-none rounded-3xl'
+			className='object-none rounded-3xl cursor-pointer'
+			onClick={() => router.push('/')}
 		    />
 		    <TextField
 			variant="outlined" 
@@ -43,7 +44,7 @@ const Navbar = () => {
 		    />
 		    <div className="flex flex-row space-x-2 items-center justify-center">
 			<Button className='p-2 px-5 rounded-xl text-white whitespace-nowrap' variant="outlined" onClick={() => router.push('/')}>Home</Button>
-			<Button className='p-2 px-5 rounded-xl text-white whitespace-nowrap' variant="outlined">Workout plans</Button>
+			<Button className='p-2 px-5 rounded-xl text-white whitespace-nowrap' variant="outlined" onClick={() => router.push('/recommendations')}>Recommendations</Button>
 			<Button className='p-2 px-5 rounded-xl text-white whitespace-nowrap' variant="outlined" onClick={() => router.push('/exercises')}>Exercises list</Button>
 			<div className="border rounded-xl border-gray-200">
 			    {

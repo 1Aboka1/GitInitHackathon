@@ -1,10 +1,12 @@
 import {Box, Button, Chip, MenuItem, OutlinedInput, Select, SelectChangeEvent, TextField, Theme, ThemeProvider} from "@mui/material"
+import { AnimatePresence, motion } from "framer-motion"
 import {GetServerSideProps, InferGetServerSidePropsType, InferGetStaticPropsType} from "next"
+import * as yup from 'yup'
 import {useRouter} from "next/router"
 import { IoAdd } from 'react-icons/io5'
 import { BiDumbbell } from 'react-icons/bi'
 import { Button as ChakraButton } from '@chakra-ui/react'
-import {ReactElement, useEffect, useState} from "react"
+import {ReactElement, useEffect, useReducer, useState} from "react"
 import Footer from "../../components/layouts/home/layoutComponents/Footer"
 import Navbar from "../../components/layouts/home/layoutComponents/Navbar"
 import MainLayout from "../../components/layouts/home/MainLayout"
@@ -13,6 +15,8 @@ import {darkTheme} from "../../styles/themes"
 import {ChakraProvider, extendTheme, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, ThemeConfig, useColorMode} from "@chakra-ui/react"
 import {trpc} from "../../utils/trpc"
 import {useSession} from "next-auth/react"
+import {useForm} from "react-hook-form"
+import {yupResolver} from "@hookform/resolvers/yup"
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     const equipmentRoute = query['equipmentFilters'] as string
@@ -21,7 +25,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     const tempMuscleFilters = typeof muscleRoute === 'string' ? muscleRoute.split(',') : muscleRoute
     const exercises = await prisma.exercise.findMany({
 	where: {
-	    OR: [
+	    AND: [
 		{
 		    primaryMuscles: {
 			some: {
@@ -79,7 +83,7 @@ const Exercises = ({ exercises, muscleFilters, equipmentFilters }: InferGetServe
 
     useEffect(() => {
 	if((router.query['muscleFilters'] === undefined || router.query['equipmentFilters'] === undefined)) {
-	    router.push('/exercises?muscleFilters=[]&equipmentFilters=[]', undefined, { shallow: true })
+	    router.push('/exercises?muscleFilters=&equipmentFilters=', undefined, { shallow: true })
 	} else {
 	    const muscleRoute = router.query['muscleFilters']
 	    const tempMuscleFilters = typeof muscleRoute === 'string' ? muscleRoute.split(',') : muscleRoute
@@ -137,36 +141,109 @@ const Exercises = ({ exercises, muscleFilters, equipmentFilters }: InferGetServe
 	userInfo.data?.id ? setUserInfoId(userInfo.data?.id) : null
     }, [userInfo.data?.id])
     
-    const handleSomething = () => {
+    const {
+	register,
+	handleSubmit,
+	setValue,
+	getValues,
+	formState: { errors },
+    } = useForm<Inputs>({
+	resolver: yupResolver(validationSchema)
+    })
+
+    const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
+    const [success, setSuccess] = useState(false)
+    useEffect(() => {
+	addExercise.isSuccess ? setSuccess(true) : setSuccess(false)
+    }, [addExercise.isSuccess])
+    const fetchedWorkoutPlan = trpc.workoutPlan.getWorkoutPlan.useQuery({ userInfoId: userInfoId })
+
+    const createWorkout = trpc.workoutPlan.createWorkout.useMutation()
+    const onFormSubmit = handleSubmit((data) => {
+	if(userInfoId) {
+	    if(!workoutPlan.data?.id) {
+		createWorkout
+		    .mutateAsync({
+			name: 'My Workout',
+			userInfoId: userInfoId,
+		    })
+		    .then((response) => {
+			if(workoutPlan.data?.id) {
+			    addExercise
+				.mutateAsync({
+				    exerciseId: modalExcercise,
+				    workoutId: workoutPlan.data?.id,
+				    sets: data.sets,
+				    reps: data.reps,
+				    rest: data.rest,
+				})
+				.then((response) => {
+				    forceUpdate()
+				})
+				.catch((error) => {
+				    console.log(error)
+				})
+			}
+		    })
+	    }
+	} else {
+	    router.push('/profile/edit_profile')
+	}
 	if(workoutPlan.data?.id) {
 	    addExercise
 		.mutateAsync({
 		    exerciseId: modalExcercise,
 		    workoutId: workoutPlan.data?.id,
+		    sets: data.sets,
+		    reps: data.reps,
+		    rest: data.rest,
 		})
 		.catch((error) => {
 		    console.log(error)
 		})
 	}
-    }
+    })
 
     return (
 	<div className="min-h-screen bg-black pt-10 space-y-3">
 	    <ChakraProvider theme={theme}>
-		<Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
+		<Modal isOpen={isModalOpen} onClose={() => {setModalOpen(false); setSuccess(false)}}>
 		    <ModalOverlay/>
 		    <ModalContent>
 			<ModalHeader>Add new exercise</ModalHeader>
 			<ModalCloseButton/>
 			<ModalBody>
 			    <ThemeProvider theme={darkTheme}>
-				<div className="flex flex-col space-y-4">
+				<div className="flex flex-col space-y-4"
+				>
 				    <div className="flex flex-row space-x-2 justify-between">
-					<TextField variant="outlined" className="rounded-xl bg-gray-900" placeholder="Sets"/>
-					<TextField variant="outlined" className="rounded-xl bg-gray-900" placeholder="Reps"/>
-					<TextField variant="outlined" className="rounded-xl bg-gray-900" placeholder="Rests"/>
+					<div className="flex flex-col">
+					<TextField 
+					{...register('sets', { required: true })}
+					color={errors.sets && 'error'}
+					variant="outlined" className="rounded-xl bg-gray-900" placeholder="Sets"/>
+					<FieldError error={errors.sets}/>
+					</div>
+					<div className="flex flex-col">
+					<TextField 
+					{...register('reps', { required: true })}
+					color={errors.reps && 'error'}
+					variant="outlined" className="rounded-xl bg-gray-900" placeholder="Reps"/>
+					<FieldError error={errors.reps}/>
+					</div>
+					<div className="flex flex-col">
+					<TextField 
+					{...register('rest', { required: true })}
+					color={errors.rest && 'error'}
+					variant="outlined" className="rounded-xl bg-gray-900" placeholder="Rests"/>
+					<FieldError error={errors.rest}/>
+					
+					</div>
 				    </div>
-				    <Button onClick={handleSomething} className="rounded-xl bg-gradient-to-tl from-blue-500 to-gray-500 text-white font-semibold" variant="contained">Add</Button>
+				    <Button onClick={() => onFormSubmit()} className="rounded-xl bg-gradient-to-tl from-blue-500 to-gray-500 text-white font-semibold" variant="contained">Add</Button>
+				    <div hidden={!success}>
+					<p className="text-green-500">Success!</p>
+				    </div>
 				</div>
 			    </ThemeProvider>
 			</ModalBody>
@@ -248,14 +325,26 @@ const Exercises = ({ exercises, muscleFilters, equipmentFilters }: InferGetServe
 	    </div>
 	    <div className="flex flex-col divide-y divide-dotted space-y-6">
 		{
-		    exercises.map((exercise: typeof exercises[0]) => <Excercise setModalExcercise={setModalExcercise} setModalOpen={setModalOpen} key={exercise.id} exercise={exercise}/>)	
+		    exercises.map((exercise: typeof exercises[0]) => <Excercise workoutPlan={fetchedWorkoutPlan} setModalExcercise={setModalExcercise} setModalOpen={setModalOpen} key={exercise.id} exercise={exercise}/>)	
 		}
 	    </div>
 	</div>
     )
 }
 
-const Excercise = ({ exercise, setModalOpen, setModalExcercise }: any) => {
+const Excercise = ({ exercise, setModalOpen, setModalExcercise, workoutPlan }: any) => {
+    const [isAlreadyInPlan, setIsAlreadyInPlan] = useState(false)
+    useEffect(() => {
+	if(workoutPlan.data === undefined || workoutPlan.data === null) {
+	    return
+	}
+	for(const item in workoutPlan.data.workoutPlanOnExercises) {
+	    if(item.exerciseId === exercise.id) {
+		setIsAlreadyInPlan(true)
+		return
+	    }	
+	}
+    })
     const [equipments, setEquipments] = useState<string>()
     const [primaryMuscles, setPrimaryMuscles] = useState<string>()
     useEffect(() => {
@@ -286,14 +375,27 @@ const Excercise = ({ exercise, setModalOpen, setModalExcercise }: any) => {
 		    >
 			View details
 		    </Button>
-		    <Button
-			variant="outlined"
-			className='rounded-xl border border-blue-800 text-white px-3'
-			onClick={() => {setModalExcercise(exercise.id); setModalOpen(true) }}
-		    >
-			<IoAdd className="mr-2" size={24}/>
-			Add
-		    </Button>
+		    {
+			isAlreadyInPlan ?
+			<Button
+			    variant="outlined"
+			    className='rounded-xl border border-blue-800 text-white px-3'
+			    disabled
+			    onClick={() => {setModalExcercise(exercise.id); setModalOpen(true) }}
+			>
+			    <IoAdd className="mr-2" size={24}/>
+			    In Plan
+			</Button>
+			:
+			<Button
+			    variant="outlined"
+			    className='rounded-xl border border-blue-800 text-white px-3'
+			    onClick={() => {setModalExcercise(exercise.id); setModalOpen(true) }}
+			>
+			    <IoAdd className="mr-2" size={24}/>
+			    Add
+			</Button>
+		    }
 		</div>
 	    </div>
 	)
@@ -320,6 +422,41 @@ function getStyles(name: string, personName: readonly string[], theme: Theme) {
         ? theme.typography.fontWeightRegular
         : theme.typography.fontWeightMedium,
   };
+}
+
+type Inputs = {
+    sets: number,
+    reps: number,
+    rest: number,
+}
+
+const validationSchema = yup.object({
+    sets: yup.number().required('Required field'),
+    reps: yup.number().required('Required field'),
+    rest: yup.number().required('Required field'),
+})
+
+const FieldError = ({ error }: any) => {
+    if(error) {
+	return (
+	    <AnimatePresence
+		mode='wait'
+	    >
+		<motion.div 
+		    className="text-red-600 text-sm"
+		    key={error?.message}
+		    initial={{ y: 10, opacity: 0 }}
+		    animate={{ y: 0, opacity: 1 }}
+		    exit={{ y: -10, opacity: 0 }}
+		    transition={{ duration: 0.3 }}
+		>
+		    {error?.message}
+		</motion.div>
+	    </AnimatePresence>
+	)
+    } else {
+	return null
+    }
 }
 
 Exercises.getLayout = function getLayout(page: ReactElement) {

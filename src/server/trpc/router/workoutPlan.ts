@@ -6,7 +6,7 @@ export const workoutPlanRouter = router({
 	.input(
 	    z.object({
 		name: z.string(),
-		userId: z.string(),
+		userInfoId: z.string(),
 	    })
 	)
 	.mutation(async ({ ctx, input }) => {
@@ -14,7 +14,7 @@ export const workoutPlanRouter = router({
 		await ctx.prisma.workoutPlan.create({
 		    data: {
 			name: input.name,
-			userInfoId: input.userId,
+			userInfoId: input.userInfoId,
 		    },
 		    select: {
 			id: true,
@@ -60,6 +60,39 @@ export const workoutPlanRouter = router({
 		return await ctx.prisma.workoutPlan.findFirst({
 		    where: {
 			userInfoId: input.userInfoId,
+		    },
+		    include: {
+			workoutPlanOnExercises: {
+			    include: {
+				exercise: {
+				    include: {
+					primaryMuscles: true,
+					equipments: true,
+				    }
+				}
+			    }
+			}
+		    },
+		})
+	    } catch(error) {
+		console.error(error)
+	    }
+	}),
+    deleteExerciseFromWorkoutPlan: protectedProcedure
+	.input(
+	    z.object({
+		exerciseId: z.string(),
+		workoutId: z.string(),
+	    })
+	)
+	.mutation(async ({ ctx, input }) => {
+	    try {
+		await ctx.prisma.workoutPlanOnExercise.delete({
+		    where: {
+			workoutPlanId_exerciseId: {
+			    workoutPlanId: input.workoutId,
+			    exerciseId: input.exerciseId,
+			}
 		    }
 		})
 	    } catch(error) {
